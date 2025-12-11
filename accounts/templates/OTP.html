@@ -1,0 +1,187 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <title>Check Code</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+    <style>
+      /* --- Glassmorphism Form Style --- */
+      .login-wrap {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-radius: 15px;
+        padding: 45px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .login-wrap h3 {
+        color: #ffffff;
+        font-weight: 700;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      }
+
+      .form-group input {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        color: #ffffff;
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .form-group input::placeholder {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .form-group input:focus {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.35);
+      }
+
+      .btn-primary {
+        background: #007bff;
+        border-color: #007bff;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 18px;
+      }
+
+      .btn-primary:hover {
+        background: #0056b3;
+      }
+
+      #timer {
+        font-size: 20px;
+        font-weight: 700;
+        color: white;
+      }
+
+      #expired-message {
+        display: none;
+        color: #ff4444;
+        font-size: 16px;
+      }
+
+      #resend-btn.disabled {
+        pointer-events: none;
+        opacity: 0.4;
+      }
+    </style>
+  </head>
+
+  <body class="img js-fullheight" style="background-image: url('{% static 'img/phone-with-black-friday-inscription-table.jpg' %}');">
+
+    <section class="ftco-section">
+      <div class="container">
+
+        {% if form.non_field_errors %}
+        <div class="row justify-content-center mb-4">
+          <div class="col-md-6">
+            {% for error in form.non_field_errors %}
+              <div class="alert alert-danger text-center rounded shadow-sm p-3">
+                {{ error }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-4">
+
+            <div class="login-wrap">
+              <h3 class="mb-4 text-center">Enter Verification Code</h3>
+
+              <form action="{% url 'check_otp' %}" method="post" id="otp-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                  {{ form.code }}
+
+                  {% if form.code.errors %}
+                    <div class="invalid-feedback d-block text-white" style="text-shadow: 0 0 5px rgba(0,0,0,0.8);">
+                      {{ form.code.errors.0 }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group mt-4">
+                  <button type="submit" class="form-control btn btn-primary submit px-3" id="submit-button">
+                    Check Code
+                  </button>
+                </div>
+
+                <!-- Timer + Expiration Message -->
+                <div class="w-100 text-center mt-3">
+                    <p id="timer">2:00</p>
+                    <p id="expired-message">Code expired. Please resend.</p>
+                </div>
+
+                <!-- Resend Button -->
+                <div class="w-100 text-center mt-3">
+                    <a id="resend-btn" class="text-white disabled" style="text-decoration: underline; opacity: 0.5;">
+                        Resend Code
+                    </a>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      let timeLeft = 120;
+
+      function updateTimer() {
+        const timer = document.getElementById("timer");
+        const resendBtn = document.getElementById("resend-btn");
+        const checkBtn = document.getElementById("submit-button");
+
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+
+        if (seconds < 10) seconds = "0" + seconds;
+
+        timer.textContent = `${minutes}:${seconds}`;
+
+        if (timeLeft <= 0) {
+          timer.textContent = "Expired";
+          timer.style.color = "red";
+
+          // Disable check code button
+          checkBtn.disabled = true;
+
+          // Show expiration message
+          document.getElementById("expired-message").style.display = "block";
+
+          // Enable resend button
+          resendBtn.classList.remove("disabled");
+          resendBtn.style.opacity = "1";
+          resendBtn.href = "{% url 'resend_code' %}";
+
+          return;
+        }
+
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+
+      document.addEventListener("DOMContentLoaded", updateTimer);
+    </script>
+
+  </body>
+</html>
