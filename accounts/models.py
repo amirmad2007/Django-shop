@@ -1,11 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-
 from datetime import timedelta
-# Create your models here.
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+# Create your models here.
 
 
 # you can add managers in managers.py
@@ -100,4 +99,3 @@ class OTP(models.Model):
 
     def __str__(self):
         return f"{self.phone_number} - {self.code}"
-

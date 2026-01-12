@@ -6,8 +6,7 @@ from .forms import LoginForm , SignupForm , OtpForm
 import ghasedak_sms
 import uuid
 from datetime import datetime
-from django.utils import timezone
-from datetime import timedelta
+
 from random import randint  
 SMS = ghasedak_sms.Ghasedak(
     api_key='c7da7ddf8908b586cb3cf2ab0f6b32fa95ccee04438d8a1bc2871434ff6f9754BWyfZ6bWE4sZk89M'
