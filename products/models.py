@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
+from accounts.models import MyUser as User
 from django.core.exceptions import ValidationError
 # Create your models here.
 class Category(models.Model):
@@ -59,7 +60,7 @@ class Product(models.Model):
     updated_at  = models.DateTimeField( auto_now=True)
     category = models.ManyToManyField(Category, related_name='products')
     slug = models.SlugField(unique=True,blank=True)
-    
+    base_price = models.DecimalField( max_digits=10, decimal_places=3)
     def get_absolute_url(self):
         return reverse("product_detail", kwargs={"slug": self.slug})
     
@@ -78,6 +79,7 @@ class Product(models.Model):
         return self.title
 
 class ProductManager(models.Manager):
+
     def available_products(self):
         return self.filter(is_active=True)
 
@@ -107,3 +109,15 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return f"{self.product.title} - {self.color or 'No Color'} - {self.size or 'No Size'}"
+
+
+class Comment(models.Model):
+
+    product = models.ForeignKey( Product, on_delete=models.CASCADE)
+    user = models.ForeignKey( User ,on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+          
+          return f'{self.user.username} - {self.text[:30]}'

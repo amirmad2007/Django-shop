@@ -116,8 +116,7 @@ def check_otp(request):
             otp  = OTP.objects.filter(phone_number=phone_number, code=str(code)).first()
             if otp:
                 if otp.is_valid():
-            
-                
+             
                     user = User.objects.create_user(
                         username=username,
                         email=email,

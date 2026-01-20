@@ -38,36 +38,44 @@
                     </a>
                 </div>
             </div>
-
+            
             <div class="col-lg-7 h-auto mb-30">
                 <div class="h-100 bg-light p-30">
                     <h3>{{product.title}}</h3>
-                    <h3 class="font-weight-semi-bold mb-4">$150.00</h3>
-                    <p class="mb-4">Volup erat ipsum diam elitr rebum et dolor. Est nonumy elitr erat diam stet sit
-                        clita ea. Sanc ipsum et, labore clita lorem magna duo dolor no sea
-                        Nonumy</p>
+                        <h3 id="price" class="font-weight-semi-bold mb-4">
+                        ${{ product.base_price }}
+                    </h3>
+                    {% if sizes or color %}
+                  <p id="availability" class="text-muted">
+                        Please select size and color
+                    </p>
+                    {% endif %}
                     <div class="d-flex mb-3">
+                        {% if sizes %}
                         <strong class="text-dark mr-3">Sizes:</strong>
                  
                         <form>
-                            {% for size in unique_sizes %}
+                            {% for size in sizes %}
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" id="{{size.id}}" name="size" value = "{{size.id}}">
-                                <label class="custom-control-label" for="{{size.id}}">{{size.name}}</label>
+                                <input type="radio" class="custom-control-input" id="size-{{ size.id }}" name="size" value = "{{size.id}}">
+                                <label class="custom-control-label" for="size-{{ size.id }}">{{size.name}}</label>
                             </div>
                             {% endfor %}
+                        {% endif %}
                         </form>
                     </div>
                     <div class="d-flex mb-4">
+                        {% if colors %}
                         <strong class="text-dark mr-3">Colors:</strong>
                   
                         <form>
-                            {% for group in color_list %}
+                            {% for color in colors %}
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" id="{{group.grouper.id}}" name="color" value = "{{gr}}">
-                                <label class="custom-control-label" for="{{group.grouper.id}}">{{group.grouper.name}}</label>
+                                <input type="radio" class="custom-control-input" id="color-{{ color.id }}" name="color" value = "{{color.id}}">
+                                <label class="custom-control-label" for="color-{{ color.id }}">{{color.name}}</label>
                             </div>
                             {% endfor %}
+                        {% endif %}
                         </form>
                     </div>
                     <div class="d-flex align-items-center mb-4 pt-2">
@@ -284,6 +292,40 @@
         </div>
     </div>
     <!-- Products End -->
+<script>
+let selectedSize = null;
+let selectedColor = null;
 
+document.querySelectorAll('input[name="size"]').forEach(input => {
+    input.addEventListener('change', function () {
+        selectedSize = this.value;
+        loadVariant();
+    });
+});
+
+document.querySelectorAll('input[name="color"]').forEach(input => {
+    input.addEventListener('change', function () {
+        selectedColor = this.value;
+        loadVariant();
+    });
+});
+
+function loadVariant() {
+    if (!selectedSize || !selectedColor) return;
+
+    fetch(`/get-variant/?product_id={{ product.id }}&size_id=${selectedSize}&color_id=${selectedColor}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('price').innerText = 'Not available';
+                document.getElementById('availability').innerText = '';
+            } else {
+                document.getElementById('price').innerText = `$${data.price}`;
+                document.getElementById('availability').innerText =
+                    `In stock: ${data.quantity}`;
+            }
+        });
+}
+</script>
 
 {% endblock %}
