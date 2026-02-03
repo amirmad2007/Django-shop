@@ -145,7 +145,7 @@ class OtpForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter OTP Code'}),
         validators=[
             MinLengthValidator(4),
-    
+            min
         ]
     )
     def clean(self):

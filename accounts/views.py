@@ -71,7 +71,7 @@ def signup(request):
             )
 
             # SMS.send_otp_sms(otp_command)
-
+            OTP.objects.filter(phone_number=cd["phone_number"]).delete()
             OTP.objects.create(
                 phone_number=cd["phone_number"],
                 code=str(code)
@@ -126,6 +126,7 @@ def check_otp(request):
 
                     login(request, user)
                     otp.delete()
+                    request.session.pop('signup_data', None)
                     return redirect("home")
                 else:
                     form.add_error(None, "Code has expired")
@@ -142,28 +143,42 @@ def user_log_out(request):
     return redirect('home') 
 
 def resend_code(request):
+       
+      if request.user.is_authenticated:
+               return redirect("home")
+       
       code = randint(1000, 9999)
       print(code)
       signup_data = request.session.get('signup_data')
-      phone_number = signup_data['phone_number']
-      otp_command = ghasedak_sms.SendOtpInput(
-                send_date=datetime.now(),   
-                receptors=[
-                    ghasedak_sms.SendOtpReceptorDto(
-                        mobile=signup_data["phone_number"],
-                        client_reference_id = str(uuid.uuid4())
-                    )
-                ],
-                template_name='Ghasedak',   
-                inputs=[
-                    ghasedak_sms.SendOtpInput.OtpInput(param='Code', value=str(code)),
-                ],
-                udh=False
-            )
 
-    #   SMS.send_otp_sms(otp_command)
-      OTP.objects.create(phone_number = phone_number , code =str(code))
-      return redirect('check_otp')
+      if not signup_data:
+              return redirect('signup')
+      
+      phone_number = signup_data['phone_number']
+
+      otp  = OTP.objects.filter(phone_number=phone_number).first()
+      if otp:
+           return redirect("check_otp")
+      else:
+        otp_command = ghasedak_sms.SendOtpInput(
+                    send_date=datetime.now(),   
+                    receptors=[
+                        ghasedak_sms.SendOtpReceptorDto(
+                            mobile=signup_data["phone_number"],
+                            client_reference_id = str(uuid.uuid4())
+                        )
+                    ],
+                    template_name='Ghasedak',   
+                    inputs=[
+                        ghasedak_sms.SendOtpInput.OtpInput(param='Code', value=str(code)),
+                    ],
+                    udh=False
+                )
+
+        #   SMS.send_otp_sms(otp_command)
+        
+        OTP.objects.create(phone_number = phone_number , code =str(code))
+        return redirect('check_otp')
 
 
 

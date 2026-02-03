@@ -5,7 +5,7 @@ from django.http import JsonResponse
 def detail(request,slug):
 
     product = get_object_or_404(Product, slug = slug)
-    variants = product.variants.select_related('color', 'size').all()  # بهینه‌سازی
+    variants = product.variants.select_related('color', 'size').all()  
     variants_with_image = [v for v in variants if v.image]
     colors = Color.objects.filter(productvariant__product=product).distinct()
     sizes = Size.objects.filter(productvariant__product=product).distinct()

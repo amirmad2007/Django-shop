@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountConfig',
     "debug_toolbar",
     'products',
+    'cart',
 ]
 
 MIDDLEWARE = [
