@@ -8,10 +8,7 @@ def detail(request,slug):
     variants = product.variants.select_related('color', 'size').all()  # بهینه‌سازی
     variants_with_image = [v for v in variants if v.image]
     colors = Color.objects.filter(productvariant__product=product).distinct()
-
     sizes = Size.objects.filter(productvariant__product=product).distinct()
-
-
 
     return render(request, 'detail.html',context= {'product' : product , 'variants_with_image' : variants_with_image , 'sizes' : sizes , 'colors' : colors })
 
