@@ -1,5 +1,5 @@
 ﻿# Django-shop
-# Django Shop
+
 
 یک پروژه وب فروشگاه ساده با Python و Django برای تمرین و یادگیری.
 
@@ -14,4 +14,5 @@
 1. کلون پروژه:
 ```bash
 git clone https://github.com/amirmad2007/Django-shop.git
+
 
