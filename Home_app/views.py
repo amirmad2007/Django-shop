@@ -7,14 +7,12 @@ from products.models import *
 class HomeView(TemplateView):
     template_name = 'index.html'
 
-class CartView(TemplateView):
-    template_name = 'cart.html'
+
 
 class CheckoutView(TemplateView):
     template_name = 'checkout.html'
 
-class DetailView(TemplateView):
-    template_name = 'detail.html'
+
 
 class ShopView(ListView):
     model = Product

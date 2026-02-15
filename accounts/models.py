@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+
 from django.utils import timezone
 from datetime import timedelta
 from django.db import models
@@ -52,12 +52,11 @@ class MyUser(AbstractBaseUser):
         unique=True,
     )
     username = models.CharField( max_length=50, unique= True)
-    date_of_birth = models.DateField(null=True , blank= True)
+
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default= False)
     is_superuser = models.BooleanField(default=False)
-    profile_picture = models.ImageField( upload_to="profile_Pictures", blank=True , null=True)
     phone_number =models.CharField(max_length=12,unique=True)
     objects = MyUserManager()
 
@@ -99,3 +98,13 @@ class OTP(models.Model):
 
     def __str__(self):
         return f"{self.phone_number} - {self.code}"
+
+class Profile(models.Model):
+
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
+    first_name = models.CharField( max_length=50 , null= True , blank= True)
+    last_name = models.CharField( max_length=50 , blank= True , null= True)
+    date_of_birth = models.DateField(null=True , blank= True)
+    created_date = models.DateTimeField( auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    profile_picture = models.ImageField( upload_to="profile_Pictures", blank=True , null=True)

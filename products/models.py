@@ -61,6 +61,8 @@ class Product(models.Model):
     category = models.ManyToManyField(Category, related_name='products')
     slug = models.SlugField(unique=True,blank=True)
     base_price = models.DecimalField( max_digits=10, decimal_places=3)
+    base_image = models.ImageField(upload_to='product_image' , default= None)
+
     def get_absolute_url(self):
         return reverse("product_detail", kwargs={"slug": self.slug})
     
